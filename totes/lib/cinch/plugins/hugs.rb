@@ -1,5 +1,4 @@
 
-
 require 'cinch'
 require 'yaml'
 
