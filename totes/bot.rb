@@ -12,6 +12,7 @@ bot = Cinch::Bot.new do
   configure do |c|
     # plugins
     c.plugins.plugins = [Cinch::Plugins::Identify, Cinch::Plugins::SelfieTrain, Cinch::Plugins::Alert]
+    c.plugins.prefix = /^./
     c.plugins.options[Cinch::Plugins::Identify] = {
       username: 'NICK',
       password: 'PASSWORD',
