@@ -3,15 +3,14 @@ require 'cinch'
 require 'cinch/plugins/identify'
 require_relative "lib/cinch/plugins/selfietrain"
 require_relative "lib/cinch/plugins/alert"
-
+require_relative "lib/cinch/plugin/PLUGIN GOES HERE"
 
 $admins = ['admin 1', 'admin 2']
 
 # botstuff
 bot = Cinch::Bot.new do
   configure do |c|
-    # plugins
-    c.plugins.plugins = [Cinch::Plugins::Identify, Cinch::Plugins::SelfieTrain, Cinch::Plugins::Alert]
+    c.plugins.plugins = [Cinch::Plugins::Identify, Cinch::Plugins::SelfieTrain, Cinch::Plugins::Alert] # plugins
     c.plugins.prefix = /^./
     c.plugins.options[Cinch::Plugins::Identify] = {
       username: 'NICK',
