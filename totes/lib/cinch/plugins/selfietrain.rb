@@ -32,7 +32,6 @@ $selfie = false # toggle selfie train
       File.open("#{Dir.home}/totes/dbs/#{dbname}.yaml", 'w') { |hash| hash.puts db.to_yaml }
     end
 
-  # !
 # selfie train! CHOO CHOO!
     match(/selfietrain (.+)/, method:  :selfietrain)
     def selfietrain(m, time)
