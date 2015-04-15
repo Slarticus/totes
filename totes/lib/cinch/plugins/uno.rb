@@ -202,13 +202,6 @@ module Cinch::Plugins
 	$hands = {}
 	$drawPile = []
 	$discardPile = []
-
-	while $game == true
-		$hands[$turn].each do |card|
-		end
-	end
   end
 end
 
-# need draw/autodraw functionality
-# autodraw, uno truth check/revert
