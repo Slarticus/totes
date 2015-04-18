@@ -18,12 +18,12 @@ module Cinch::Plugins
         else
           buffer = []
           n = 0
-          colors = [:red, :orange, :yellow, :green, :teal, :blue, :purple] 
+          colors = [:red, :orange, :yellow, :green, :teal, :blue, :purple]
           "#{@suite} #{@face}".each_char do |i|
             buffer << Format(colors[n % colors.length], i)
             n += 1
           end
-          buffer.join()
+          buffer.join
         end
       end
       attr_accessor :suite, :face
@@ -128,7 +128,7 @@ module Cinch::Plugins
       real_card = @@players[m.user.nick].hand[card.to_i]
       player_index = @@players.keys.index(m.user.nick)
 
-      if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length) && (card.to_i >= 0) && ((@color == false) || (@color == nil))
+      if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length) && (card.to_i >= 0) && ((@color == false) || (@color.nil?))
         if (@@discardPile.last.suite == real_card.suite) || (@@discardPile.last.face == real_card.face)
 
           # special faces
@@ -146,7 +146,7 @@ module Cinch::Plugins
             @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
           end
           # /special faces: covert ops
-          
+
           @@discardPile << real_card
           @@players[m.user.nick].hand.delete real_card
           m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
@@ -159,13 +159,12 @@ module Cinch::Plugins
             @color = true
             m.reply "#{m.user.nick}, use !color <color name> to change the suite."
             4.times { @@players[@@players.keys[(player_index + 1) % @@players.keys.length]].hand << @@drawPile.pop }
-
             m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]} drew four cards."
           end
-          @@discardPile << real_card unless (real_card.face == :change_color) or (real_card.face == :draw_four)
+          @@discardPile << real_card unless (real_card.face == :change_color) || (real_card.face == :draw_four)
           @@players[m.user.nick].hand.delete real_card
         end
-      hand(m)
+        hand(m)
       else
       end
     end
@@ -181,9 +180,9 @@ module Cinch::Plugins
       player_index = @@players.keys.index(m.user.nick)
       if (@color == true) && (@turn == m.user.nick)
         @@discardPile.last.suite = color
-          @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
-          @color = false
-          m.reply "Suite changed: #{@@discardPile.last.readable}. It's #{@turn}'s turn."
+        @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+        @color = false
+        m.reply "Suite changed: #{@@discardPile.last.readable}. It's #{@turn}'s turn."
       end
     end
 
