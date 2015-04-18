@@ -73,27 +73,32 @@ module Cinch::Plugins
         @name = name
         @score = 0
         @hand = []; 7.times { @hand << Uno.class_variable_get(:@@drawPile).pop }
+        @uno = false
       end
-      attr_reader :name, :score, :hand
+      attr_reader :name
+      attr_accessor :score, :hand, :uno
     end
 
     @@players = {}
     @@first_run = true
 
     def start(m)
-      @game = true
-      @@drawPile = Deck.new.deck
-      @@discardPile = []; @@discardPile << @@drawPile.pop
+      
       if @@first_run == true
-        if @@players.keys.length < 1 # TODO CHANGE TO 2; they smell after dancing for too long
-          m.reply "Waiting for #{2 - @@players.keys.length} more players to join..."
-        elsif (@@players.keys.length >= 1) # TODO CHANGE TO 2
-          @turn = @@players.keys[rand(@@players.keys.length)]
-          m.reply 'Starting game...'
-          m.reply "It's #{@turn}'s turn. First card: #{@@discardPile.last.readable}"
-          hand(m)
-          @@first_run = false
-        end
+        @game = true
+        @@drawPile = Deck.new.deck
+        @@discardPile = []; @@discardPile << @@drawPile.pop
+        @@first_run = false
+        @directionality = 1
+      end
+
+      if @@players.keys.length < 1 # TODO CHANGE TO 2; they smell after dancing for too long
+        m.reply "Waiting for #{2 - @@players.keys.length} more players to join..."
+      elsif (@@players.keys.length >= 1) # TODO CHANGE TO 2
+        @turn = @@players.keys[rand(@@players.keys.length)]
+        m.reply 'Starting game...' if @@first_run == true
+        m.reply "It's #{@turn}'s turn. First card: #{@@discardPile.last.readable}"
+        hand(m)
       end
     end
 
@@ -105,12 +110,14 @@ module Cinch::Plugins
     end
 
     def join(m)
-      if (@game == true) && (@@players.keys.length < 10) && !(@@players.keys.include? m.user.nick)
+      if (@@first_run == false) && (@@players.keys.length < 10) && !(@@players.keys.include? m.user.nick)
         @@players[m.user.nick] = Player.new(m.user.nick)
         m.reply "#{m.user.nick} has joined the game! #{10 - @@players.length} spots remaining."
         start(m)
       elsif (@game == true) && (@@players.keys.length == 10)
         m.reply 'The game is full!'
+      elsif (@@players.keys.include? m.user.nick) && (@game == true)
+        m.reply "(#{m.user.nick}) You're already in the game."
       else
         m.reply "(#{m.user.nick}) There is no game going on right now."
       end
@@ -124,7 +131,7 @@ module Cinch::Plugins
           buffer.concat ["[#{n}] " + i]
           n += 1
         end
-        m.reply buffer.join(', ')
+        User(m.user.nick).send buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
       end
     end
 
@@ -133,21 +140,37 @@ module Cinch::Plugins
       player_index = @@players.keys.index(m.user.nick)
 
       if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length) && (card.to_i >= 0) && ((@color == false) || (@color.nil?))
-        if (@@discardPile.last.suite == real_card.suite) || (@@discardPile.last.face == real_card.face)
+        if (@@discardPile.last.suite == real_card.suite) || (@@discardPile.last.face == real_card.face) || (@@discardPile.last.suite == :wild)
 
           # special faces
           if real_card.face == :skip
-            @turn = @@players.keys[(player_index + 2) % @@players.keys.length]
-            m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]}'s turn was skipped."
+            if @directionality == 1
+              @turn = @@players.keys[(player_index + 2) % @@players.keys.length]
+              m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]}'s turn was skipped."
+            elsif @directionality == -1
+              @turn = @@players.keys[(player_index + - 2) % @@players.keys.length]
+              m.reply "#{@@players.keys[(player_index + - 1) % @@players.keys.length]}'s turn was skipped."
+            end
+
 
           elsif real_card.face == :draw_two
             2.times { @@players[@@players.keys[(player_index + 1) % @@players.keys.length]].hand << @@drawPile.pop }
             m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]} drew two cards."
 
           elsif real_card.face == :reversal
+            if @directionality == 1
+              @directionality = -1
+            elsif @directionality == -1
+              @directionality = 1
+            end
+            m.reply "Directionality reversed. #{@directionality}"
 
           else
-            @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+            if @directionality == 1
+              @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+            elsif @directionality == -1
+              @turn = @@players.keys[(player_index + - 1) % @@players.keys.length]
+            end
           end
           # /special faces: covert ops
 
@@ -155,7 +178,7 @@ module Cinch::Plugins
           @@players[m.user.nick].hand.delete real_card
           m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
 
-        elsif real_card.suite == :wild
+        elsif (real_card.suite == :wild) || ((@@discardPile.last == :wild) && real_card.suite == :wild)
           if real_card.face == :change_color
             @color = true
             m.reply "#{m.user.nick}, use !color <color name> to change the suite."
@@ -174,29 +197,55 @@ module Cinch::Plugins
     end
 
     def draw(m)
-      @@players[m.user.nick].hand << @@drawPile.pop
-      m.reply "#{m.user.nick} drew a card."
-      hand(m)
+      if (@game == true) && (@turn == m.user.nick)
+        player_index = @@players.keys.index(m.user.nick)
+        @@players[m.user.nick].hand << @@drawPile.pop
+        m.reply "#{m.user.nick} drew a card."
+        hand(m)
+        if @directionality == 1
+          @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+        elsif @directionality == -1
+          @turn = @@players.keys[(player_index + - 1) % @@players.keys.length]
+        end
+        m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
+      end
     end
 
     def color(m, color)
       color = color.to_sym
       player_index = @@players.keys.index(m.user.nick)
-      if (@color == true) && (@turn == m.user.nick)
+      if (@color == true) && (@turn == m.user.nick) && (@game == true)
         @@discardPile.last.suite = color
-        @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+        if @directionality == 1
+          @turn = @@players.keys[(player_index + 1) % @@players.keys.length]
+        elsif @directionality == -1
+          @turn = @@players.keys[(player_index + - 1) % @@players.keys.length]
+        end
         @color = false
         m.reply "Suite changed: #{@@discardPile.last.readable}. It's #{@turn}'s turn."
       end
     end
 
     def pile(m)
-      if @game == true
+      if (@game == true)
         m.reply @@discardPile.last.readable
       end
     end
 
     def points(m)
+    end
+
+    def declare_uno(m)
+      if (@turn == m.user.nick) && (@@players[m.user.nick].hand.length == 1) && (@game == true)
+        @@players[m.user.nick].uno = true
+        m.reply "#{m.user.nick} declared uno!"
+      elsif (@turn == m.user.nick) && (@@players[m.user.nick].hand.length > 1) && (@game == true)
+        m.reply "You must have one card to declare uno, #{m.user.nick}"
+      elsif !(@turn == m.user.nick) && (@game == true)
+        m.reply "It's not your turn, #{m.user.nick}"
+      elsif @game == false
+        m.reply "There is no game going on right now, #{m.user.nick}."
+      end
     end
 
     match(/start/, method:  :start)
@@ -208,6 +257,7 @@ module Cinch::Plugins
     match(/color (\S+)/, method:  :color)
     match(/pile/, method:  :pile)
     match(/points/, method:  :points)
+    match(/uno/, method:  :declare_uno)
   end
 end
 
