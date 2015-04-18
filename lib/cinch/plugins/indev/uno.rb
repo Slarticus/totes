@@ -150,6 +150,7 @@ module Cinch::Plugins
           @@discardPile << real_card
           @@players[m.user.nick].hand.delete real_card
           m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
+
         elsif real_card.suite == :wild
 
           if real_card.face == :change_color
