@@ -18,7 +18,7 @@ module Cinch::Plugins
         else
           buffer = []
           n = 0
-          colors = [:red, :orange, :yellow, :green, :turquoise, :blue, :purple] 
+          colors = [:red, :orange, :yellow, :green, :teal, :blue, :purple] 
           "#{@suite} #{@face}".each_char do |i|
             buffer << Format(colors[n % colors.length], i)
             n += 1
@@ -151,13 +151,19 @@ module Cinch::Plugins
           @@players[m.user.nick].hand.delete real_card
           m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
         elsif real_card.suite == :wild
+
           if real_card.face == :change_color
             @color = true
             m.reply "#{m.user.nick}, use !color <color name> to change the suite."
-          elsif real_card.face == :wild_draw_four
-            # how are you going to take user input?
+          elsif real_card.face == :draw_four
+            @color = true
+            m.reply "#{m.user.nick}, use !color <color name> to change the suite."
+            4.times { @@players[@@players.keys[(player_index + 1) % @@players.keys.length]].hand << @@drawPile.pop }
+
+            m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]} drew four cards."
           end
-          @@discardPile << real_card unless real_card.face == :change_color
+
+          @@discardPile << real_card unless (real_card.face == :change_color) or (real_card.face == :draw_four)
           @@players[m.user.nick].hand.delete real_card
         end
       hand(m)
