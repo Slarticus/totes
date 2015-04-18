@@ -14,11 +14,15 @@ module Cinch::Plugins
 
       def readable
         if @suite != :wild
-          Format(@suite, "#{@suite} #{@face}")
+          if @suite == :blue
+            Format(:royal, "#{@suite} #{@face}")
+          else
+            Format(@suite, "#{@suite} #{@face}")
+          end
         else
           buffer = []
           n = 0
-          colors = [:red, :orange, :yellow, :green, :teal, :blue, :purple]
+          colors = [:red, :orange, :yellow, :green, :teal, :purple]
           "#{@suite} #{@face}".each_char do |i|
             buffer << Format(colors[n % colors.length], i)
             n += 1
