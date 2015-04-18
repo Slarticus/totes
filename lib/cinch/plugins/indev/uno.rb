@@ -88,11 +88,11 @@ module Cinch::Plugins
         @game = true
         @@drawPile = Deck.new.deck
         @@discardPile = []; @@discardPile << @@drawPile.pop
-        @@first_run = false
         @directionality = 1
+        @@first_run = false
       end
 
-      if @@players.keys.length < 1 # TODO CHANGE TO 2; they smell after dancing for too long
+      if @@players.keys.length < 1 # TODO CHANGE TO 2
         m.reply "Waiting for #{2 - @@players.keys.length} more players to join..."
       elsif (@@players.keys.length >= 1) # TODO CHANGE TO 2
         @turn = @@players.keys[rand(@@players.keys.length)]
@@ -248,6 +248,9 @@ module Cinch::Plugins
       end
     end
 
+    def status(m)
+    end
+
     match(/start/, method:  :start)
     match(/stop/, method:  :stop)
     match(/join/, method:  :join)
@@ -260,5 +263,3 @@ module Cinch::Plugins
     match(/uno/, method:  :declare_uno)
   end
 end
-
-# needs autodraw; draw until player has valid card
