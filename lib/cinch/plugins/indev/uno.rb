@@ -152,7 +152,6 @@ module Cinch::Plugins
           m.reply "It's #{@turn}'s turn. Last played: #{@@discardPile.last.readable}"
 
         elsif real_card.suite == :wild
-
           if real_card.face == :change_color
             @color = true
             m.reply "#{m.user.nick}, use !color <color name> to change the suite."
@@ -163,7 +162,6 @@ module Cinch::Plugins
 
             m.reply "#{@@players.keys[(player_index + 1) % @@players.keys.length]} drew four cards."
           end
-
           @@discardPile << real_card unless (real_card.face == :change_color) or (real_card.face == :draw_four)
           @@players[m.user.nick].hand.delete real_card
         end
