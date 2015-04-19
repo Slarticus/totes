@@ -130,7 +130,7 @@ module Cinch::Plugins
           buffer.concat ["[#{n}] " + i]
           n += 1
         end
-        Target(m.user.nick).notice buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
+        Target(m.user.nick).notice buffer.join(', ')
       end
     end
 
@@ -141,7 +141,6 @@ module Cinch::Plugins
       if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length - 1) && (card.to_i >= 0) && ((@color == false) || (@color.nil?))
         if (@@discardPile.last.suite == real_card.suite) || (@@discardPile.last.face == real_card.face) || (@@discardPile.last.suite == :wild)
 
-          # special faces
           if real_card.face == :skip
             if @directionality == 1
               @turn = @@players.keys[(player_index + 2) % @@players.keys.length]
@@ -171,7 +170,6 @@ module Cinch::Plugins
               @turn = @@players.keys[(player_index + - 1) % @@players.keys.length]
             end
           end
-          # /special faces: covert ops
 
           @@discardPile << real_card
           @@players[m.user.nick].hand.delete real_card
