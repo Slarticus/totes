@@ -130,7 +130,7 @@ module Cinch::Plugins
           buffer.concat ["[#{n}] " + i]
           n += 1
         end
-        m.reply buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
+        Target(m.user.nick).notice buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
       end
     end
 
