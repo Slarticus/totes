@@ -83,7 +83,6 @@ module Cinch::Plugins
     @@first_run = true
 
     def start(m)
-      
       if @@first_run == true
         @game = true
         @@drawPile = Deck.new.deck
@@ -131,7 +130,7 @@ module Cinch::Plugins
           buffer.concat ["[#{n}] " + i]
           n += 1
         end
-        User(m.user.nick).send buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
+        m.reply buffer.join(', ') # Without opening a new tab? # TODO: Change to whisper
       end
     end
 
@@ -139,7 +138,7 @@ module Cinch::Plugins
       real_card = @@players[m.user.nick].hand[card.to_i]
       player_index = @@players.keys.index(m.user.nick)
 
-      if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length) && (card.to_i >= 0) && ((@color == false) || (@color.nil?))
+      if (@game == true) && (@turn == m.user.nick) && (card.to_i <= @@players[m.user.nick].hand.length - 1) && (card.to_i >= 0) && ((@color == false) || (@color.nil?))
         if (@@discardPile.last.suite == real_card.suite) || (@@discardPile.last.face == real_card.face) || (@@discardPile.last.suite == :wild)
 
           # special faces
@@ -240,7 +239,7 @@ module Cinch::Plugins
         @@players[m.user.nick].uno = true
         m.reply "#{m.user.nick} declared uno!"
       elsif (@turn == m.user.nick) && (@@players[m.user.nick].hand.length > 1) && (@game == true)
-        m.reply "You must have one card to declare uno, #{m.user.nick}"
+        m.reply "You must have only one card to declare uno, #{m.user.nick}"
       elsif !(@turn == m.user.nick) && (@game == true)
         m.reply "It's not your turn, #{m.user.nick}"
       elsif @game == false
