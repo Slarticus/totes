@@ -10,24 +10,14 @@ module Cinch::Plugins
       include Cinch::Plugin
 
       def initialize(suit, rank)
-        suits = %w(red yellow green blue wild)
-        ranks = %w(0 1 2 3 4 5 6 7 8 9) + ['skip', 'reverse', 'draw two']
-        if (suits.include? suit) && (ranks.include? rank.to_s)
-          @suit, @rank = suit, rank
-        elsif (suits.include? suit) && (['change color', 'draw four'].include? rank.to_s)
-          @suit, @rank = suit, rank
-        end
+        @suit, @rank = suit, rank
       end
       attr_accessor :suit, :rank
 
       def to_s
-        if @suit != 'wild'
-          if @suit == 'blue'
-            Format(:royal, "#{@suit} #{@rank}")
-          else
-            Format(@suit.to_sym, "#{@suit} #{@rank}")
-          end
-        else
+        if @suit == 'blue'
+          Format(:royal, "#{@suit} #{@rank}")
+        elsif suit == 'wild'
           buffer = []
           n = 0
           colors = [:red, :orange, :yellow, :green, :royal, :purple]
@@ -40,6 +30,8 @@ module Cinch::Plugins
             n += 1
           end
           buffer.join
+        else
+          Format(@suit.to_sym, "#{@suit} #{@rank}")
         end
       end
 
