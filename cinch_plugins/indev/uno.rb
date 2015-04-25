@@ -66,11 +66,7 @@ module Cinch::Plugins
       end
 
       def to_s
-        buffer = []
-        self.each do |card|
-          buffer << card.to_s
-        end
-        buffer
+        self.map(&:to_s)
       end
     end
 
