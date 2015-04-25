@@ -83,6 +83,9 @@ module Cinch::Plugins
         def self.game
           @game
         end
+
+        def self.handle_turns
+        end
       end
 
       GC = GameController
@@ -90,10 +93,8 @@ module Cinch::Plugins
 
     # top-level class documentation comment
     class Player
-      include GameController
-      
       class Hand < Array
-        def readable
+        def to_s
           buffer = ''
           n = 0
           self.map(&:to_s).each do |i|
@@ -158,5 +159,6 @@ module Cinch::Plugins
     def last(m)
     end
     #---
+
   end
 end
