@@ -97,8 +97,8 @@ module Cinch::Plugins
           buffer = ''
           n = 0
           self.map(&:to_s).each do |i|
-          buffer.concat "[#{n}]" + " #{i} "
-          n += 1
+            buffer.concat "[#{n}]" + " #{i} "
+            n += 1
           end
           buffer
         end
@@ -157,6 +157,6 @@ module Cinch::Plugins
     match(/last/, method:  :last)
     def last(m)
     end
-
+    #---
   end
 end
