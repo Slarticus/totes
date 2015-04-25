@@ -1,5 +1,5 @@
 # totes
-This is a collection of poorly written Cinch/CloudBot plugins.
+This is a poorly written, unfinished Uno bot.
 
 DISCLAIMER: I'm fool.
 
