@@ -1,7 +1,7 @@
 # totes
 This is a collection of poorly written Cinch/CloudBot plugins.
 
-DISCLAIMER: I'm fool. The code is ugly because I am new to this.
+DISCLAIMER: I'm fool.
 
 
 Relevant links:
